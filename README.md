@@ -78,6 +78,7 @@ The following tools were used in the construction of the project:
 #### **Server** ([Node.js](https://nodejs.org/en/))
 
 - **[dotENV](https://github.com/motdotla/dotenv)**
+- **[EJS](https://ejs.co/)**
 - **[Express](https://expressjs.com/)**
 - **[Lodash](https://lodash.com/)**
 - **[Mongoose](https://mongoosejs.com/)**
