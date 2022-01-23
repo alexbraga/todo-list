@@ -46,8 +46,8 @@ const listSchema = new mongoose.Schema({
 const List = new mongoose.model("List", listSchema);
 
 app.get("/", function (req, res) {
-  Item.find({}, function (err, items) {
-    if (items.length === 0) {
+  Item.find({}, function (err, foundItems) {
+    if (foundItems.length === 0) {
       Item.insertMany(defaultItems, (err) => {
         if (err) {
           console.log(err);
@@ -58,7 +58,30 @@ app.get("/", function (req, res) {
 
       res.redirect("/");
     } else {
-      res.render("list", { listTitle: "Today", newListItems: items });
+      res.render("list", { listTitle: "Today", newListItems: foundItems });
+    }
+  });
+});
+
+app.get("/:customList", function (req, res) {
+  const listTitle = _.capitalize(req.params.customList);
+
+  List.findOne({ name: listTitle }, (err, foundList) => {
+    if (!err) {
+      if (!foundList) {
+        const list = new List({
+          name: listTitle,
+          items: defaultItems,
+        });
+
+        list.save();
+        res.redirect("/" + listTitle);
+      } else {
+        res.render("list", {
+          listTitle: foundList.name,
+          newListItems: foundList.items,
+        });
+      }
     }
   });
 });
@@ -75,7 +98,7 @@ app.post("/", function (req, res) {
     item.save();
     res.redirect("/");
   } else {
-    List.findOne({name: listName}, (err, foundList) => {
+    List.findOne({ name: listName }, (err, foundList) => {
       foundList.items.push(item);
       foundList.save();
     });
@@ -98,32 +121,16 @@ app.post("/delete", function (req, res) {
       }
     });
   } else {
-    List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}}, (err, foundList) => {
-      if (!err) {
-        res.redirect("/" + listName);
+    List.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: checkedItemId } } },
+      (err, foundList) => {
+        if (!err) {
+          res.redirect("/" + listName);
+        }
       }
-    });
+    );
   }
-});
-
-app.get("/:customList", function (req, res) {
-  const listTitle = _.capitalize(req.params.customList);
-
-  List.findOne ({name: listTitle}, (err, foundList) => {
-    if (!err) {
-      if (!foundList) {
-        const list = new List({
-          name: listTitle,
-          items: defaultItems,
-        });
-
-        list.save();
-        res.redirect("/" + listTitle);
-      } else {
-        res.render("list", { listTitle: foundList.name, listItems: foundList.items });
-      }
-    }
-  });
 });
 
 app.get("/about", function (req, res) {
