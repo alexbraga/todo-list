@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://todo-list-73661.herokuapp.com/" rel="noopener noreferrer" target="_blank">To-do List</a>
+  To-do List
 </h1>
 
 <h3 align="center">
